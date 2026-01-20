@@ -7,7 +7,7 @@
     <style>
         /* ستايل الصفحة بالكامل */
         body {
-            background-color: #1a1a1a; /* الأسود الفخم الذي اخترته */
+            background-color: #1a1a1a; /* الأسود الفخم */
             color: #ffd700;           /* اللون الذهبي */
             text-align: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -18,27 +18,34 @@
         /* تنسيق العنوان */
         h1 {
             font-size: 2.5rem;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
-        /* تنسيق الزر (ستايل آيفون 11 كما في الكود الخاص بك) */
+        /* تنسيق الوصف */
+        .description {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #ffd700;
+        }
+
+        /* تنسيق الزر (ستايل آيفون 11) */
         button {
             background-color: #ffd700;
             color: black;
             padding: 15px 35px;
-            border-radius: 12px; /* حواف ناعمة */
+            border-radius: 12px;
             border: none;
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.3s; /* حركة ناعمة */
+            transition: 0.3s;
             box-shadow: 0px 4px 15px rgba(255, 215, 0, 0.3);
             margin-bottom: 30px;
         }
 
         button:hover {
             background-color: #e6c200;
-            transform: scale(1.1); /* تكبير بسيط عند اللمس */
+            transform: scale(1.05);
         }
 
         /* إزالة الخط من الرابط */
@@ -50,6 +57,7 @@
         .map-container {
             margin: 30px auto;
             max-width: 90%;
+            height: 400px;
             border-radius: 20px;
             overflow: hidden;
             border: 2px solid #ffd700;
@@ -60,7 +68,7 @@
 <body>
 
     <h1>المهندس محمود صحبي</h1>
-    <p>مهندس مساحة - الرياض</p>
+    <p class="description">مهندس مساحة - الرياض</p>
 
     <a href="https://www.facebook.com/SA7ABY/" target="_blank">
         <button>تواصل معي عبر فيسبوك</button>
@@ -68,9 +76,9 @@
 
     <div class="map-container">
         <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m13!1m2!1s0x3e2f03890d48939b%3A0x88a5150257424191!2z2KfZhNix2YrYp9i2INin2YTYs9iudm9ka2h8!5e0!3m2!1sar!2ssa!4v1705758000000!5m2!1sar!2ssa" 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d231884.2882208756!2d46.48344669453125!3d24.7135517!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e2f03890d8741bb%3A0x44a3c3411c0ed1!2sRiyadh%20Saudi%20Arabia!5e0!3m2!1sen!2s!4v1705760000000!5m2!1sen!2s" 
             width="100%" 
-            height="400" 
+            height="100%" 
             style="border:0;" 
             allowfullscreen="" 
             loading="lazy">
