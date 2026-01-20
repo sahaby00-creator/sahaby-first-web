@@ -5,62 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>بروفايل المهندس محمود صحبي</title>
     <style>
-        /* إعدادات الجسم الرئيسي - ستايل احترافي داكن */
+        /* ستايل الصفحة بالكامل */
         body {
-            background-color: #1a1a1a; /* أسود ملكي */
-            color: #ffd700; /* ذهبي */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a; /* الأسود الفخم الذي اخترته */
+            color: #ffd700;           /* اللون الذهبي */
             text-align: center;
-            padding: 50px 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: 50px;
             margin: 0;
         }
 
-        /* تنسيق العنوان الرئيسي */
+        /* تنسيق العنوان */
         h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-size: 2.5rem;
+            margin-bottom: 20px;
         }
 
-        /* تنسيق النصوص الفرعية */
-        p {
-            color: #ffffff;
-            font-size: 1.2em;
+        /* تنسيق الزر (ستايل آيفون 11 كما في الكود الخاص بك) */
+        button {
+            background-color: #ffd700;
+            color: black;
+            padding: 15px 35px;
+            border-radius: 12px; /* حواف ناعمة */
+            border: none;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s; /* حركة ناعمة */
+            box-shadow: 0px 4px 15px rgba(255, 215, 0, 0.3);
             margin-bottom: 30px;
         }
 
-        /* تنسيق الزر - مستوحى من انسيابية iPhone 11 */
-        .btn-contact {
-            display: inline-block;
-            background-color: #ffd700;
-            color: #1a1a1a;
-            padding: 15px 35px;
-            border-radius: 12px; /* حواف ناعمة */
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 18px;
-            transition: 0.3s; /* نعومة في الحركة */
-            box-shadow: 0px 4px 15px rgba(255, 215, 0, 0.3);
-            border: none;
-            cursor: pointer;
+        button:hover {
+            background-color: #e6c200;
+            transform: scale(1.1); /* تكبير بسيط عند اللمس */
         }
 
-        .btn-contact:hover {
-            transform: scale(1.05); /* تكبير بسيط عند التمرير */
-            background-color: #e6c200;
+        /* إزالة الخط من الرابط */
+        a {
+            text-decoration: none;
         }
 
         /* تنسيق الخريطة */
         .map-container {
-            margin-top: 40px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        iframe {
-            width: 100%;
-            height: 350px;
-            border-radius: 20px; /* حواف دائرية مثل تطبيقات الآيفون */
+            margin: 30px auto;
+            max-width: 90%;
+            border-radius: 20px;
+            overflow: hidden;
             border: 2px solid #ffd700;
-            box-shadow: 0px 10px
+            box-shadow: 0px 10px 30px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>المهندس محمود صحبي</h1>
+    <p>مهندس مساحة - الرياض</p>
+
+    <a href="https://www.facebook.com/SA7ABY/" target="_blank">
+        <button>تواصل معي عبر فيسبوك</button>
+    </a>
+
+    <div class="map-container">
+        <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m13!1m2!1s0x3e2f03890d48939b%3A0x88a5150257424191!2z2KfZhNix2YrYp9i2INin2YTYs9iudm9ka2h8!5e0!3m2!1sar!2ssa!4v1705758000000!5m2!1sar!2ssa" 
+            width="100%" 
+            height="400" 
+            style="border:0;" 
+            allowfullscreen="" 
+            loading="lazy">
+        </iframe>
+    </div>
+
+</body>
+</html>
