@@ -10,29 +10,40 @@
             color: #ffd700;           
             text-align: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding-top: 50px;
+            padding-top: 30px;
             margin: 0;
         }
-        h1 { font-size: 2.5rem; margin-bottom: 10px; }
-        .description { font-size: 1.2rem; margin-bottom: 30px; }
+        h1 { font-size: 2.2rem; margin-bottom: 5px; }
+        .description { font-size: 1.1rem; margin-bottom: 20px; color: #ffffff; }
         
+        /* صندوق الإحداثيات */
+        #coords-box {
+            background: #333;
+            color: #ffd700;
+            padding: 10px;
+            margin: 10px auto;
+            width: fit-content;
+            border-radius: 8px;
+            border: 1px solid #ffd700;
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+
         button {
             background-color: #ffd700;
             color: black;
-            padding: 15px 35px;
+            padding: 12px 30px;
             border-radius: 12px;
             border: none;
-            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
             box-shadow: 0px 4px 15px rgba(255, 215, 0, 0.3);
         }
 
         .map-container {
-            margin: 30px auto;
+            margin: 20px auto;
             max-width: 90%;
-            height: 400px;
+            height: 350px;
             border-radius: 20px;
             overflow: hidden;
             border: 2px solid #ffd700;
@@ -44,39 +55,34 @@
     <h1>المهندس محمود صحابي</h1>
     <p class="description">مهندس مساحة - الرياض</p>
 
+    <div id="coords-box">جاري جلب الإحداثيات...</div>
+
     <a href="https://www.facebook.com/SA7ABY/" target="_blank">
         <button>تواصل معي عبر فيسبوك</button>
     </a>
 
     <div class="map-container" id="mapBox">
-        <p style="padding-top: 180px;">جاري تحديد موقع تليفونك...</p>
+        <p style="padding-top: 150px;">يرجى السماح بالوصول للموقع...</p>
     </div>
 
     <script>
-        // كود برمجي لجلب موقعك الحالي من التليفون أو الكمبيوتر
         function getLocation() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, showError);
+                // طلب الموقع بدقة عالية (مهم للمساحة)
+                navigator.geolocation.getCurrentPosition(showPosition, showError, {
+                    enableHighAccuracy: true
+                });
             } else {
-                document.getElementById("mapBox").innerHTML = "المتصفح لا يدعم تحديد الموقع.";
+                document.getElementById("coords-box").innerHTML = "المتصفح لا يدعم GPS";
             }
         }
 
         function showPosition(position) {
             var lat = position.coords.latitude;
             var lon = position.coords.longitude;
-            // إنشاء رابط خريطة بناءً على إحداثياتك اللحظية
-            var mapUrl = "https://maps.google.com/maps?q=" + lat + "," + lon + "&z=15&output=embed";
-            document.getElementById("mapBox").innerHTML = '<iframe width="100%" height="100%" frameborder="0" src="' + mapUrl + '"></iframe>';
-        }
+            
+            // عرض الإحداثيات في الصندوق
+            document.getElementById("coords-box").innerHTML = 
+                "خط العرض (Lat): " + lat.toFixed(6) + " | خط الطول (Lon): " + lon.toFixed(6);
 
-        function showError(error) {
-            document.getElementById("mapBox").innerHTML = "يرجى تفعيل 'Location' في المتصفح ليظهر موقعك.";
-        }
-
-        // تشغيل الوظيفة فور فتح الصفحة
-        window.onload = getLocation;
-    </script>
-
-</body>
-</html>
+            //
