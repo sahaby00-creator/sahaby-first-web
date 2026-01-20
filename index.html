@@ -1,59 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sahaby First Web</title>
+    <title>بروفايل المهندس محمود صحبي</title>
     <style>
-        /* تنسيق الصفحة بالكامل */
+        /* إعدادات الجسم الرئيسي - ستايل احترافي داكن */
         body {
-            background-color: #1a1a1a; /* خلفية سوداء فخمة */
-            color: #ffd700;           /* خط ذهبي */
-            text-align: center;       /* محاذاة في المنتصف */
-            font-family: Arial, sans-serif;
-            padding-top: 100px;
+            background-color: #1a1a1a; /* أسود ملكي */
+            color: #ffd700; /* ذهبي */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            padding: 50px 20px;
             margin: 0;
         }
 
-        /* تنسيق اسمك */
+        /* تنسيق العنوان الرئيسي */
         h1 {
-            font-size: 3rem;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* تنسيق النصوص الفرعية */
+        p {
+            color: #ffffff;
+            font-size: 1.2em;
             margin-bottom: 30px;
         }
 
-        /* تنسيق الزر (ستايل آيفون 11) */
-        button {
+        /* تنسيق الزر - مستوحى من انسيابية iPhone 11 */
+        .btn-contact {
+            display: inline-block;
             background-color: #ffd700;
-            color: black;
+            color: #1a1a1a;
             padding: 15px 35px;
-            border-radius: 12px; /* حواف دائرية ناعمة */
-            border: none;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s; /* نعومة في الحركة */
-            box-shadow: 0px 4px 15px rgba(255, 215, 0, 0.3); /* ظل خفيف */
-        }
-
-        /* تأثير عند مرور الماوس على الزر */
-        button:hover {
-            background-color: #e6c200;
-            transform: scale(1.1); /* تكبير بسيط للزر */
-        }
-
-        /* إزالة الخط الأزرق من الرابط */
-        a {
+            border-radius: 12px; /* حواف ناعمة */
             text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+            transition: 0.3s; /* نعومة في الحركة */
+            box-shadow: 0px 4px 15px rgba(255, 215, 0, 0.3);
+            border: none;
+            cursor: pointer;
         }
-    </style>
-</head>
-<body>
 
-    <h1>sahaby learning code</h1>
+        .btn-contact:hover {
+            transform: scale(1.05); /* تكبير بسيط عند التمرير */
+            background-color: #e6c200;
+        }
 
-    <a href="https://www.facebook.com/SA7ABY/" target="_blank">
-        <button>Contact Me</button>
-    </a>
+        /* تنسيق الخريطة */
+        .map-container {
+            margin-top: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
-</body>
-</html>
+        iframe {
+            width: 100%;
+            height: 350px;
+            border-radius: 20px; /* حواف دائرية مثل تطبيقات الآيفون */
+            border: 2px solid #ffd700;
+            box-shadow: 0px 10px
