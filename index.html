@@ -5,16 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>المهندس محمود صحابي | مهندس مساحة في الرياض</title>
-    <meta name="description" content="الموقع الرسمي للمهندس محمود صحابي، متخصص في الأعمال المساحية والهندسية في الرياض، المملكة العربية السعودية. تواصل معنا للحصول على خدمات مساحية دقيقة.">
-    <meta name="keywords" content="محمود صحابي, المهندس محمود صحابي, مهندس مساحة الرياض, مساحة اراضي, رفع مساحي الرياض, Mahmoud Sahaby">
-    <meta name="author" content="المهندس محمود صحابي">
+    <meta name="description" content="الموقع الرسمي للمهندس محمود صحابي، متخصص في الأعمال المساحية والهندسية في الرياض. تواصل معنا للرفع المساحي وإحداثيات GPS دقيقة.">
+    <meta name="keywords" content="محمود صحابي, المهندس محمود صحابي, مهندس مساحة الرياض, Mahmoud Sahaby, مساحة اراضي الرياض">
     
-    <meta property="og:title" content="المهندس محمود صحابي - بروفايل مهني">
-    <meta property="og:description" content="خبير أعمال مساحية بالرياض">
-    <meta property="og:url" content="https://sahaby00-creator.github.io/sahaby-first-web/">
-
     <style>
-        /* التنسيق الملكي (أسود وذهبي) المتوافق مع iPhone 11 */
         body {
             background-color: #1a1a1a; 
             color: #ffd700;           
@@ -23,11 +17,8 @@
             padding: 30px 10px;
             margin: 0;
         }
-
-        h1 { font-size: 2.5rem; margin-bottom: 5px; color: #ffd700; }
+        h1 { font-size: 2.5rem; margin-bottom: 5px; }
         .sub-title { color: #ffffff; font-size: 1.2rem; margin-bottom: 20px; }
-
-        /* صندوق الإحداثيات الاحترافي */
         #coords-box {
             background: rgba(255, 215, 0, 0.1);
             color: #ffd700;
@@ -38,11 +29,7 @@
             border: 1px solid #ffd700;
             font-family: 'Courier New', monospace;
             font-weight: bold;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
         }
-
-        /* تنسيق الأزرار */
-        .btn-container { margin: 25px 0; }
         button {
             background-color: #ffd700;
             color: #000;
@@ -56,16 +43,7 @@
             box-shadow: 0px 5px 15px rgba(255, 215, 0, 0.3);
             margin: 10px;
         }
-
-        button:hover { transform: translateY(-3px); background-color: #e6c200; }
-
-        .btn-secondary {
-            background: transparent;
-            border: 1px solid #ffd700;
-            color: #ffd700;
-        }
-
-        /* حاوية الخريطة */
+        button:hover { transform: scale(1.05); }
         .map-frame {
             margin: 20px auto;
             max-width: 95%;
@@ -73,10 +51,8 @@
             border-radius: 25px;
             overflow: hidden;
             border: 2px solid #ffd700;
-            box-shadow: 0px 15px 35px rgba(0,0,0,0.6);
             background: #222;
         }
-
         iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
@@ -85,51 +61,32 @@
     <h1>المهندس محمود صحابي</h1>
     <div class="sub-title">مهندس مساحة | الرياض، المملكة العربية السعودية</div>
 
-    <div id="coords-box">إحداثياتك تظهر هنا عند التفعيل</div>
+    <div id="coords-box">اضغط لتحديث الإحداثيات اللحظية</div>
 
     <div class="btn-container">
         <button onclick="updateLocation()">تحديث الموقع (GPS)</button>
         <a href="https://www.facebook.com/SA7ABY/" target="_blank">
-            <button class="btn-secondary">الملف الشخصي (فيسبوك)</button>
+            <button style="background:none; border:1px solid #ffd700; color:#ffd700;">فيسبوك</button>
         </a>
     </div>
 
     <div class="map-frame" id="mapDisplay">
-        <p style="padding-top: 180px; color: #555;">برجاء الضغط على الزر لتفعيل الخريطة اللحظية</p>
+        <p style="padding-top: 180px; color: #555;">برجاء تفعيل الـ GPS لرؤية موقعك</p>
     </div>
 
     <script>
-        // كود جلب الموقع الفعلي بدقة عالية للمساحة
         function updateLocation() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(success, fail, {
-                    enableHighAccuracy: true
-                });
-            } else {
-                alert("المتصفح لا يدعم تحديد الموقع.");
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    document.getElementById('coords-box').innerHTML = `LAT: ${lat.toFixed(6)} | LON: ${lon.toFixed(6)}`;
+                    const mapUrl = `https://maps.google.com/maps?q=${lat},${lon}&z=16&output=embed`;
+                    document.getElementById('mapDisplay').innerHTML = `<iframe src="${mapUrl}"></iframe>`;
+                }, () => alert("برجاء تفعيل الموقع"), {enableHighAccuracy: true});
             }
         }
-
-        function success(pos) {
-            const lat = pos.coords.latitude;
-            const lon = pos.coords.longitude;
-            
-            // عرض الإحداثيات بدقة 6 أرقام
-            document.getElementById('coords-box').innerHTML = 
-                `LAT: ${lat.toFixed(6)} | LON: ${lon.toFixed(6)}`;
-
-            // تحديث إطار الخريطة
-            const mapUrl = `https://maps.google.com/maps?q=${lat},${lon}&z=16&output=embed`;
-            document.getElementById('mapDisplay').innerHTML = `<iframe src="${mapUrl}"></iframe>`;
-        }
-
-        function fail() {
-            alert("فشل جلب الموقع. يرجى تفعيل الـ GPS والسماح للمتصفح بالوصول.");
-        }
-
-        // تشغيل الوظيفة تلقائياً عند فتح الصفحة
         window.onload = updateLocation;
     </script>
-
 </body>
 </html>
