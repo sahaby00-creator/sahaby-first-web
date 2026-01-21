@@ -3,13 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="الموقع الرسمي للمهندس محمود صحابي - مهندس مساحة في الرياض">
     <title>بروفايل المهندس محمود صحابي</title>
     <style>
-        body { background-color: #1a1a1a; color: #ffd700; text-align: center; font-family: 'Segoe UI', sans-serif; padding-top: 30px; margin: 0; }
-        h1 { font-size: 2.2rem; }
-        #coords-box { background: #333; color: #ffd700; padding: 10px; margin: 15px auto; width: fit-content; border-radius: 8px; border: 1px solid #ffd700; font-family: monospace; }
-        button { background-color: #ffd700; color: black; padding: 12px 30px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin: 5px; }
-        .map-container { margin: 20px auto; max-width: 90%; height: 350px; border-radius: 20px; overflow: hidden; border: 2px solid #ffd700; background: #222; }
+        /* التنسيق العام (ستايل داكن فخم) */
+        body {
+            background-color: #1a1a1a; 
+            color: #ffd700;           
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: 30px;
+            margin: 0;
+        }
+
+        h1 { font-size: 2.2rem; margin-bottom: 5px; }
+        p { color: #ffffff; margin-bottom: 20px; }
+
+        /* صندوق الإحداثيات (مهم جداً للمساحة) */
+        #coords-box {
+            background: rgba(255, 215, 0, 0.1);
+            color: #ffd700;
+            padding: 10px 20px;
+            margin: 15px auto;
+            width: fit-content;
+            border-radius: 50px;
+            border: 1px solid #ffd700;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* تنسيق الأزرار (نظام iOS) */
+        .btn-group { margin: 20px; }
+        button {
+            background-color: #ffd700;
+            color: black;
+            padding: 12px 30px;
+            border-radius: 12px;
+            border: none;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+            transition: 0.3s;
+            box-shadow: 0px 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        button:hover { transform: scale(1.05); background-color: #e6c200; }
+
+        .fb-btn {
+            background: none;
+            border: 1px solid #ffd700;
+            color: #ffd700;
+        }
+
+        /* حاوية الخريطة */
+        .map-container {
+            margin: 20px auto;
+            max-width: 95%;
+            height: 400px;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px solid #ffd700;
+            box-shadow: 0px 10px 30px rgba(0,0,0,0.5);
+            background-color: #222;
+        }
+
+        iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body>
@@ -17,23 +77,26 @@
     <h1>المهندس محمود صحابي</h1>
     <p>مهندس مساحة - الرياض</p>
 
-    <div id="coords-box">اضغط على "تفعيل الموقع" لإظهار الإحداثيات</div>
+    <div id="coords-box">Lat: --.------ | Lon: --.------</div>
 
-    <button onclick="getLocation()">تفعيل الموقع اللحظي</button>
-
-    <a href="https://www.facebook.com/SA7ABY/" target="_blank">
-        <button style="background-color: transparent; color: #ffd700; border: 1px solid #ffd700;">فيسبوك</button>
-    </a>
+    <div class="btn-group">
+        <button onclick="getLocation()">تحديث الموقع اللحظي</button>
+        <a href="https://www.facebook.com/SA7ABY/" target="_blank">
+            <button class="fb-btn">فيسبوك</button>
+        </a>
+    </div>
 
     <div class="map-container" id="mapBox">
-        <p style="padding-top: 150px; color: #666;">الخريطة ستظهر هنا عند السماح بالموقع</p>
+        <p style="padding-top: 180px; color: #666;">اضغط على الزر بالأعلى لتفعيل الخريطة</p>
     </div>
 
     <script>
+        // وظيفة جلب الموقع بدقة عالية
         function getLocation() {
             if (navigator.geolocation) {
-                // طلب الموقع مع إجبار المتصفح على إظهار رسالة السماح
-                navigator.geolocation.getCurrentPosition(showPosition, showError, { enableHighAccuracy: true });
+                navigator.geolocation.getCurrentPosition(showPosition, showError, {
+                    enableHighAccuracy: true
+                });
             } else {
                 alert("متصفحك لا يدعم تحديد الموقع");
             }
@@ -42,14 +105,12 @@
         function showPosition(position) {
             var lat = position.coords.latitude;
             var lon = position.coords.longitude;
-            document.getElementById("coords-box").innerHTML = "Lat: " + lat.toFixed(6) + " | Lon: " + lon.toFixed(6);
-            var mapUrl = "https://maps.google.com/maps?q=" + lat + "," + lon + "&z=16&output=embed";
-            document.getElementById("mapBox").innerHTML = '<iframe width="100%" height="100%" frameborder="0" src="' + mapUrl + '"></iframe>';
-        }
+            
+            // تحديث أرقام الإحداثيات في الصفحة
+            document.getElementById("coords-box").innerHTML = 
+                "Lat: " + lat.toFixed(6) + " | Lon: " + lon.toFixed(6);
 
-        function showError(error) {
-            alert("يرجى تفعيل الموقع من إعدادات المتصفح (أيقونة القفل في الأعلى)");
+            // توليد رابط الخريطة الجديد بناءً على موقعك
+            var mapUrl = "https://maps.google.com/maps?q=" + lat + "," + lon + "&z=16&output=embed";
+            document.getElementById("mapBox").innerHTML = '<iframe src="' + mapUrl + '"></iframe>';
         }
-    </script>
-</body>
-</html>
