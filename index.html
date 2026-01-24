@@ -3,25 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام المهندس محمود صحابي - Civil 3D Link</title>
+    <title>نظام المهندس محمود صحابي - Profile Creator</title>
     
     <style>
         body { background-color: #0d0d0d; color: #ffd700; text-align: center; font-family: 'Segoe UI', sans-serif; padding: 10px; margin: 0; }
         .container { background: #1a1a1a; padding: 20px; border-radius: 20px; border: 2px solid #ffd700; max-width: 600px; margin: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
         h1 { font-size: 1.6rem; color: #ffd700; margin: 0; }
-        .status-bar { background: #222; padding: 10px; border-radius: 10px; margin: 15px 0; border-right: 5px solid #28a745; font-size: 0.9rem; }
+        .status-bar { background: #222; padding: 10px; border-radius: 10px; margin: 15px 0; border-right: 5px solid #007bff; font-size: 0.9rem; }
         
         .coord-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .coord-item { background: #262626; padding: 10px; border-radius: 10px; border: 1px solid #333; }
         .label { display: block; color: #888; font-size: 0.7rem; margin-bottom: 5px; }
         .value { color: #fff; font-family: monospace; font-size: 1rem; }
 
-        /* إضافة خانة الوصف للسيفيل */
-        .desc-input { width: 90%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ffd700; background: #000; color: #fff; text-align: center; }
+        input { width: 90%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ffd700; background: #000; color: #fff; text-align: center; }
 
         button { width: 100%; padding: 15px; margin: 5px 0; border-radius: 12px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
-        .btn-add { background-color: #ffd700; color: #000; }
-        .btn-export { background-color: #1e88e5; color: #fff; }
+        .btn-capture { background-color: #ffd700; color: #000; }
+        .btn-profile { background-color: #ff5722; color: #fff; } /* لون برتقالي للبروفايل */
 
         .map-box { margin-top: 15px; height: 250px; border-radius: 15px; overflow: hidden; border: 1px solid #444; }
         iframe { width: 100%; height: 100%; border: none; }
@@ -35,33 +34,34 @@
 
     <div class="container">
         <h1>المهندس محمود صحابي</h1>
-        <p style="color:#888; font-size: 0.8rem;">رابط المساحة الميدانية و Civil 3D</p>
+        <p style="color:#888; font-size: 0.8rem;">توليد بيانات البروفايل (Profile Data)</p>
 
-        <div class="status-bar" id="status">جاهز لرصد نقطة جديدة...</div>
+        <div class="status-bar" id="status">جاهز لرصد مناسيب المسار...</div>
 
-        <input type="text" id="point-desc" class="desc-input" placeholder="اكتب وصف النقطة (مثلاً: BORDER, TREE, WALL)">
+        <input type="text" id="point-desc" placeholder="وصف النقطة (مثلاً: Station 0+100)">
+        <input type="number" id="point-elev" placeholder="أدخل المنسوب يدوياً (أو سيتم جلبه من GPS)">
 
         <div class="coord-grid">
-            <div class="coord-item"><span class="label">Northing (UTM)</span><div class="value" id="n-val">0.000</div></div>
-            <div class="coord-item"><span class="label">Easting (UTM)</span><div class="value" id="e-val">0.000</div></div>
-            <div class="coord-item"><span class="label">Latitude</span><div class="value" id="lat-val">0.000000</div></div>
-            <div class="coord-item"><span class="label">Longitude</span><div class="value" id="lon-val">0.000000</div></div>
+            <div class="coord-item"><span class="label">Northing (N)</span><div class="value" id="n-val">0.000</div></div>
+            <div class="coord-item"><span class="label">Easting (E)</span><div class="value" id="e-val">0.000</div></div>
+            <div class="coord-item"><span class="label">Elevation (Z)</span><div class="value" id="z-val">0.000</div></div>
+            <div class="coord-item"><span class="label">Accuracy</span><div class="value" id="acc-val">0.00m</div></div>
         </div>
 
-        <button class="btn-add" onclick="capturePoint()">رصد وإضافة للسجل</button>
-        <button class="btn-export" onclick="downloadCSV()">تصدير ملف (P,N,E,Z,D) للسيفيل</button>
+        <button class="btn-capture" onclick="captureProfilePoint()">رصد نقطة بروفايل</button>
+        <button class="btn-profile" onclick="downloadProfileCSV()">تصدير ملف البروفايل للسيفيل</button>
 
         <div class="map-box" id="mapView">
-            <p style="padding-top: 100px; color:#444;">الخريطة التفاعلية</p>
+            <p style="padding-top: 100px; color:#444;">موقع المسار على الخريطة</p>
         </div>
 
         <table class="points-table" id="pointsTable">
             <thead>
                 <tr>
-                    <th>PT</th>
-                    <th>Northing</th>
+                    <th>محطة</th>
                     <th>Easting</th>
-                    <th>Description</th>
+                    <th>Northing</th>
+                    <th>المنسوب (Z)</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -69,48 +69,46 @@
     </div>
 
     <script>
-        let pointsList = [];
-        let lastLat = 0, lastLon = 0;
+        let profilePoints = [];
 
-        function capturePoint() {
+        function captureProfilePoint() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(p => {
-                    lastLat = p.coords.latitude;
-                    lastLon = p.coords.longitude;
-                    let desc = document.getElementById('point-desc').value || "SURVEY_PT";
+                    let lat = p.coords.latitude;
+                    let lon = p.coords.longitude;
+                    let alt = p.coords.altitude || document.getElementById('point-elev').value || 0;
+                    let acc = p.coords.accuracy.toFixed(2);
                     
-                    let n = (lastLat * 111000).toFixed(3);
-                    let e = (lastLon * 100000).toFixed(3);
+                    let n = (lat * 111000).toFixed(3);
+                    let e = (lon * 100000).toFixed(3);
+                    let desc = document.getElementById('point-desc').value || "STA_" + (profilePoints.length * 20);
 
-                    const ptNum = pointsList.length + 1;
-                    pointsList.push({ id: ptNum, lat: lastLat, lon: lastLon, n: n, e: e, desc: desc });
+                    profilePoints.push({ id: desc, n: n, e: e, z: alt });
 
                     document.getElementById('n-val').innerText = n;
                     document.getElementById('e-val').innerText = e;
-                    document.getElementById('lat-val').innerText = lastLat.toFixed(8);
-                    document.getElementById('lon-val').innerText = lastLon.toFixed(8);
-                    document.getElementById('status').innerText = `تم حفظ النقطة رقم (${ptNum}) بوصف (${desc})`;
+                    document.getElementById('z-val').innerText = parseFloat(alt).toFixed(3);
+                    document.getElementById('acc-val').innerText = acc + "m";
+                    document.getElementById('status').innerText = `تم رصد محطة: ${desc}`;
 
                     const tableBody = document.querySelector("#pointsTable tbody");
-                    const row = `<tr><td>${ptNum}</td><td>${n}</td><td>${e}</td><td>${desc}</td></tr>`;
-                    tableBody.innerHTML += row;
+                    tableBody.innerHTML += `<tr><td>${desc}</td><td>${e}</td><td>${n}</td><td>${parseFloat(alt).toFixed(3)}</td></tr>`;
 
-                    // تحديث الخريطة بالرابط الذي أثبت نجاحه في صورتك
-                    const mapUrl = `https://maps.google.com/maps?q=${lastLat},${lastLon}&z=18&output=embed`;
+                    const mapUrl = `https://maps.google.com/maps?q=${lat},${lon}&z=18&output=embed`;
                     document.getElementById('mapView').innerHTML = `<iframe src="${mapUrl}"></iframe>`;
                 }, null, {enableHighAccuracy: true});
             }
         }
 
-        function downloadCSV() {
-            if (pointsList.length === 0) return alert("ارصد نقاط أولاً!");
-            let content = "P,N,E,Z,D\n";
-            pointsList.forEach(p => content += `${p.id},${p.n},${p.e},0,${p.desc}\n`);
+        function downloadProfileCSV() {
+            if (profilePoints.length === 0) return alert("ارصد بيانات المسار أولاً!");
+            let content = "Station,Northing,Easting,Elevation,Description\n";
+            profilePoints.forEach(p => content += `${p.id},${p.n},${p.e},${p.z},PROFILE_POINT\n`);
             
             const blob = new Blob([content], { type: 'text/csv' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "Sahaby_Civil3D_Ready.csv";
+            link.download = "Sahaby_Profile_Data.csv";
             link.click();
         }
     </script>
