@@ -3,99 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أداة المهندس محمود صحابي - رصد دقيق</title>
-    
-    <meta name="description" content="نظام رصد مساحي متطور للمهندس محمود صحابي. تحويل إحداثيات Civil 3D و Google Earth.">
+    <title>نظام رصد المهندس محمود صحابي</title>
     
     <style>
-        body { background-color: #0a0a0a; color: #ffd700; text-align: center; font-family: 'Segoe UI', sans-serif; padding: 15px; margin: 0; }
-        .main-card { background: #161616; padding: 20px; border-radius: 25px; border: 2px solid #ffd700; max-width: 550px; margin: auto; box-shadow: 0 15px 35px rgba(0,0,0,0.8); }
-        h1 { font-size: 1.8rem; margin-bottom: 5px; color: #ffd700; }
-        .tagline { color: #888; font-size: 0.9rem; margin-bottom: 20px; }
+        body { background-color: #0d0d0d; color: #ffd700; text-align: center; font-family: 'Segoe UI', sans-serif; padding: 10px; margin: 0; }
+        .container { background: #1a1a1a; padding: 20px; border-radius: 20px; border: 2px solid #ffd700; max-width: 600px; margin: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        h1 { font-size: 1.6rem; color: #ffd700; margin: 0; }
+        .status-bar { background: #222; padding: 10px; border-radius: 10px; margin: 15px 0; border-right: 5px solid #28a745; font-size: 0.9rem; }
         
-        .display-section { background: #222; padding: 15px; border-radius: 15px; margin-bottom: 15px; border-right: 5px solid #ffd700; }
-        .coord-label { color: #ffd700; font-size: 0.8rem; text-align: right; display: block; margin-bottom: 5px; }
-        .coord-value { color: #fff; font-family: 'Courier New', monospace; font-size: 1.1rem; font-weight: bold; }
+        .coord-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .coord-item { background: #262626; padding: 10px; border-radius: 10px; border: 1px solid #333; }
+        .label { display: block; color: #888; font-size: 0.7rem; margin-bottom: 5px; }
+        .value { color: #fff; font-family: monospace; font-size: 1rem; }
 
-        button { width: 100%; padding: 16px; margin: 8px 0; border-radius: 15px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
-        .btn-update { background-color: #ffd700; color: #000; }
-        .btn-civil { background-color: #1e88e5; color: #fff; }
+        button { width: 100%; padding: 15px; margin: 5px 0; border-radius: 12px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        .btn-add { background-color: #ffd700; color: #000; }
+        .btn-export { background-color: #1e88e5; color: #fff; }
         .btn-earth { background-color: #2e7d32; color: #fff; }
 
-        /* تعديل حاوية الخريطة لضمان الظهور */
-        .map-box { margin-top: 15px; height: 300px; border-radius: 15px; overflow: hidden; border: 2px solid #333; background: #000; }
+        .map-box { margin-top: 15px; height: 250px; border-radius: 15px; overflow: hidden; border: 1px solid #444; }
         iframe { width: 100%; height: 100%; border: none; }
+
+        /* جدول النقاط المرصودة */
+        .points-table { width: 100%; margin-top: 20px; border-collapse: collapse; font-size: 0.8rem; background: #111; }
+        .points-table th, .points-table td { border: 1px solid #333; padding: 8px; text-align: center; }
+        .points-table th { background: #ffd700; color: #000; }
     </style>
 </head>
 <body>
 
-    <div class="main-card">
+    <div class="container">
         <h1>المهندس محمود صحابي</h1>
-        <div class="tagline">نظام الرصد المتكامل (Civil 3D & Google Earth)</div>
+        <p style="color:#888; font-size: 0.8rem;">نظام تجميع النقاط المساحية V2.0</p>
 
-        <div class="display-section">
-            <span class="coord-label">إحداثيات Civil 3D (E, N)</span>
-            <div class="coord-value" id="civil-display">E: 0.000 | N: 0.000</div>
+        <div class="status-bar" id="status">جاهز لبدء الرصد الميداني...</div>
+
+        <div class="coord-grid">
+            <div class="coord-item"><span class="label">Northing (UTM)</span><div class="value" id="n-val">0.000</div></div>
+            <div class="coord-item"><span class="label">Easting (UTM)</span><div class="value" id="e-val">0.000</div></div>
+            <div class="coord-item"><span class="label">Latitude</span><div class="value" id="lat-val">0.000000</div></div>
+            <div class="coord-item"><span class="label">Longitude</span><div class="value" id="lon-val">0.000000</div></div>
         </div>
 
-        <div class="display-section">
-            <span class="coord-label">إحداثيات GPS (Lat, Lon)</span>
-            <div class="coord-value" id="gps-display">Lat: 0.00000000 | Lon: 0.00000000</div>
-        </div>
-
-        <button class="btn-update" onclick="fetchLocation()">تحديث رصد النقطة الحالية</button>
-        <button class="btn-civil" onclick="downloadForCivil()">تحميل ملف Civil 3D (CSV)</button>
-        <button class="btn-earth" onclick="downloadForEarth()">تحميل ملف Google Earth (CSV)</button>
+        <button class="btn-add" onclick="capturePoint()">رصد وإضافة نقطة للسجل</button>
+        <button class="btn-export" onclick="downloadCSV('civil')">تصدير السجل لـ Civil 3D</button>
+        <button class="btn-earth" onclick="downloadCSV('earth')">تصدير السجل لـ Google Earth</button>
 
         <div class="map-box" id="mapView">
-            <p style="padding-top: 130px; color: #444;">اضغط "تحديث" لإظهار موقعك على الخريطة</p>
+            <p style="padding-top: 100px; color:#444;">الخريطة التفاعلية</p>
         </div>
+
+        <table class="points-table" id="pointsTable">
+            <thead>
+                <tr>
+                    <th>PT</th>
+                    <th>Northing</th>
+                    <th>Easting</th>
+                    <th>Desc</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
     </div>
 
     <script>
-        let rawLat = 0, rawLon = 0;
+        let pointsList = [];
+        let lastLat = 0, lastLon = 0;
 
-        function fetchLocation() {
+        function capturePoint() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(p => {
-                    rawLat = p.coords.latitude;
-                    rawLon = p.coords.longitude;
+                    lastLat = p.coords.latitude;
+                    lastLon = p.coords.longitude;
                     
-                    // تحويل للأمتار كما في لقطة شاشتك السابقة
-                    let easting = (rawLon * 100000).toFixed(3);
-                    let northing = (rawLat * 111000).toFixed(3);
+                    let n = (lastLat * 111000).toFixed(3);
+                    let e = (lastLon * 100000).toFixed(3);
 
-                    document.getElementById('civil-display').innerText = `E: ${easting} | N: ${northing}`;
-                    document.getElementById('gps-display').innerText = `Lat: ${rawLat.toFixed(8)} | Lon: ${rawLon.toFixed(8)}`;
+                    // إضافة النقطة للقائمة
+                    const ptNum = pointsList.length + 1;
+                    pointsList.push({ id: ptNum, lat: lastLat, lon: lastLon, n: n, e: e });
 
-                    // الإصلاح: رابط خريطة جديد يركز على الإحداثيات (Zoom level 18)
-                    const mapUrl = `https://maps.google.com/maps?q=${rawLat},${rawLon}&z=18&output=embed`;
+                    // تحديث واجهة المستخدم
+                    document.getElementById('n-val').innerText = n;
+                    document.getElementById('e-val').innerText = e;
+                    document.getElementById('lat-val').innerText = lastLat.toFixed(8);
+                    document.getElementById('lon-val').innerText = lastLon.toFixed(8);
+                    document.getElementById('status').innerText = `تم حفظ النقطة رقم (${ptNum}) بنجاح!`;
+
+                    // تحديث الجدول
+                    const tableBody = document.querySelector("#pointsTable tbody");
+                    const row = `<tr><td>${ptNum}</td><td>${n}</td><td>${e}</td><td>SURVEY_PT</td></tr>`;
+                    tableBody.innerHTML += row;
+
+                    // تحديث الخريطة (الإصلاح الجديد)
+                    const mapUrl = `https://maps.google.com/maps?q=${lastLat},${lastLon}&z=18&output=embed`;
                     document.getElementById('mapView').innerHTML = `<iframe src="${mapUrl}"></iframe>`;
-                }, (err) => {
-                    alert("برجاء تفعيل الـ GPS والسماح للمتصفح بالوصول لموقعك.");
-                }, {enableHighAccuracy: true});
+                }, null, {enableHighAccuracy: true});
             }
         }
 
-        function downloadForCivil() {
-            if (rawLat === 0) return alert("ارصد النقطة أولاً!");
-            let n = (rawLat * 111000).toFixed(3);
-            let e = (rawLon * 100000).toFixed(3);
-            saveFile(`1,${n},${e},0,SAHABY_CIVIL`, "Sahaby_Civil3D.csv");
-        }
+        function downloadCSV(type) {
+            if (pointsList.length === 0) return alert("السجل فارغ! ارصد بعض النقاط أولاً.");
+            
+            let content = "";
+            let fileName = "";
 
-        function downloadForEarth() {
-            if (rawLat === 0) return alert("ارصد النقطة أولاً!");
-            let content = "Name,Latitude,Longitude,Description\n";
-            content += `Sahaby_Point,${rawLat.toFixed(10)},${rawLon.toFixed(10)},Survey_By_Mahmoud_Sahaby`;
-            saveFile(content, "Sahaby_GoogleEarth.csv");
-        }
+            if (type === 'civil') {
+                content = "P,N,E,Z,D\n";
+                pointsList.forEach(p => content += `${p.id},${p.n},${p.e},0,SURVEY_PT\n`);
+                fileName = "Sahaby_Points_Civil3D.csv";
+            } else {
+                content = "Name,Latitude,Longitude,Description\n";
+                pointsList.forEach(p => content += `PT_${p.id},${p.lat},${p.lon},Mahmoud_Sahaby_Survey\n`);
+                fileName = "Sahaby_Points_GoogleEarth.csv";
+            }
 
-        function saveFile(data, filename) {
-            let blob = new Blob([data], { type: 'text/csv' });
-            let link = document.createElement("a");
+            const blob = new Blob([content], { type: 'text/csv' });
+            const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = filename;
+            link.download = fileName;
             link.click();
         }
     </script>
