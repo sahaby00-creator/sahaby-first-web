@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام رصد المهندس محمود صحابي</title>
+    <title>نظام المهندس محمود صحابي - Civil 3D Link</title>
     
     <style>
         body { background-color: #0d0d0d; color: #ffd700; text-align: center; font-family: 'Segoe UI', sans-serif; padding: 10px; margin: 0; }
@@ -16,15 +16,16 @@
         .label { display: block; color: #888; font-size: 0.7rem; margin-bottom: 5px; }
         .value { color: #fff; font-family: monospace; font-size: 1rem; }
 
+        /* إضافة خانة الوصف للسيفيل */
+        .desc-input { width: 90%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ffd700; background: #000; color: #fff; text-align: center; }
+
         button { width: 100%; padding: 15px; margin: 5px 0; border-radius: 12px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
         .btn-add { background-color: #ffd700; color: #000; }
         .btn-export { background-color: #1e88e5; color: #fff; }
-        .btn-earth { background-color: #2e7d32; color: #fff; }
 
         .map-box { margin-top: 15px; height: 250px; border-radius: 15px; overflow: hidden; border: 1px solid #444; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* جدول النقاط المرصودة */
         .points-table { width: 100%; margin-top: 20px; border-collapse: collapse; font-size: 0.8rem; background: #111; }
         .points-table th, .points-table td { border: 1px solid #333; padding: 8px; text-align: center; }
         .points-table th { background: #ffd700; color: #000; }
@@ -34,9 +35,11 @@
 
     <div class="container">
         <h1>المهندس محمود صحابي</h1>
-        <p style="color:#888; font-size: 0.8rem;">نظام تجميع النقاط المساحية V2.0</p>
+        <p style="color:#888; font-size: 0.8rem;">رابط المساحة الميدانية و Civil 3D</p>
 
-        <div class="status-bar" id="status">جاهز لبدء الرصد الميداني...</div>
+        <div class="status-bar" id="status">جاهز لرصد نقطة جديدة...</div>
+
+        <input type="text" id="point-desc" class="desc-input" placeholder="اكتب وصف النقطة (مثلاً: BORDER, TREE, WALL)">
 
         <div class="coord-grid">
             <div class="coord-item"><span class="label">Northing (UTM)</span><div class="value" id="n-val">0.000</div></div>
@@ -45,9 +48,8 @@
             <div class="coord-item"><span class="label">Longitude</span><div class="value" id="lon-val">0.000000</div></div>
         </div>
 
-        <button class="btn-add" onclick="capturePoint()">رصد وإضافة نقطة للسجل</button>
-        <button class="btn-export" onclick="downloadCSV('civil')">تصدير السجل لـ Civil 3D</button>
-        <button class="btn-earth" onclick="downloadCSV('earth')">تصدير السجل لـ Google Earth</button>
+        <button class="btn-add" onclick="capturePoint()">رصد وإضافة للسجل</button>
+        <button class="btn-export" onclick="downloadCSV()">تصدير ملف (P,N,E,Z,D) للسيفيل</button>
 
         <div class="map-box" id="mapView">
             <p style="padding-top: 100px; color:#444;">الخريطة التفاعلية</p>
@@ -59,11 +61,10 @@
                     <th>PT</th>
                     <th>Northing</th>
                     <th>Easting</th>
-                    <th>Desc</th>
+                    <th>Description</th>
                 </tr>
             </thead>
-            <tbody>
-                </tbody>
+            <tbody></tbody>
         </table>
     </div>
 
@@ -76,53 +77,40 @@
                 navigator.geolocation.getCurrentPosition(p => {
                     lastLat = p.coords.latitude;
                     lastLon = p.coords.longitude;
+                    let desc = document.getElementById('point-desc').value || "SURVEY_PT";
                     
                     let n = (lastLat * 111000).toFixed(3);
                     let e = (lastLon * 100000).toFixed(3);
 
-                    // إضافة النقطة للقائمة
                     const ptNum = pointsList.length + 1;
-                    pointsList.push({ id: ptNum, lat: lastLat, lon: lastLon, n: n, e: e });
+                    pointsList.push({ id: ptNum, lat: lastLat, lon: lastLon, n: n, e: e, desc: desc });
 
-                    // تحديث واجهة المستخدم
                     document.getElementById('n-val').innerText = n;
                     document.getElementById('e-val').innerText = e;
                     document.getElementById('lat-val').innerText = lastLat.toFixed(8);
                     document.getElementById('lon-val').innerText = lastLon.toFixed(8);
-                    document.getElementById('status').innerText = `تم حفظ النقطة رقم (${ptNum}) بنجاح!`;
+                    document.getElementById('status').innerText = `تم حفظ النقطة رقم (${ptNum}) بوصف (${desc})`;
 
-                    // تحديث الجدول
                     const tableBody = document.querySelector("#pointsTable tbody");
-                    const row = `<tr><td>${ptNum}</td><td>${n}</td><td>${e}</td><td>SURVEY_PT</td></tr>`;
+                    const row = `<tr><td>${ptNum}</td><td>${n}</td><td>${e}</td><td>${desc}</td></tr>`;
                     tableBody.innerHTML += row;
 
-                    // تحديث الخريطة (الإصلاح الجديد)
+                    // تحديث الخريطة بالرابط الذي أثبت نجاحه في صورتك
                     const mapUrl = `https://maps.google.com/maps?q=${lastLat},${lastLon}&z=18&output=embed`;
                     document.getElementById('mapView').innerHTML = `<iframe src="${mapUrl}"></iframe>`;
                 }, null, {enableHighAccuracy: true});
             }
         }
 
-        function downloadCSV(type) {
-            if (pointsList.length === 0) return alert("السجل فارغ! ارصد بعض النقاط أولاً.");
+        function downloadCSV() {
+            if (pointsList.length === 0) return alert("ارصد نقاط أولاً!");
+            let content = "P,N,E,Z,D\n";
+            pointsList.forEach(p => content += `${p.id},${p.n},${p.e},0,${p.desc}\n`);
             
-            let content = "";
-            let fileName = "";
-
-            if (type === 'civil') {
-                content = "P,N,E,Z,D\n";
-                pointsList.forEach(p => content += `${p.id},${p.n},${p.e},0,SURVEY_PT\n`);
-                fileName = "Sahaby_Points_Civil3D.csv";
-            } else {
-                content = "Name,Latitude,Longitude,Description\n";
-                pointsList.forEach(p => content += `PT_${p.id},${p.lat},${p.lon},Mahmoud_Sahaby_Survey\n`);
-                fileName = "Sahaby_Points_GoogleEarth.csv";
-            }
-
             const blob = new Blob([content], { type: 'text/csv' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = fileName;
+            link.download = "Sahaby_Civil3D_Ready.csv";
             link.click();
         }
     </script>
