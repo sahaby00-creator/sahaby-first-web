@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أداة المهندس محمود صحابي - مساحة شاملة</title>
+    <title>أداة المهندس محمود صحابي - رصد دقيق</title>
+    
+    <meta name="description" content="نظام رصد مساحي متطور للمهندس محمود صحابي. تحويل إحداثيات Civil 3D و Google Earth.">
     
     <style>
         body { background-color: #0a0a0a; color: #ffd700; text-align: center; font-family: 'Segoe UI', sans-serif; padding: 15px; margin: 0; }
@@ -13,14 +15,15 @@
         
         .display-section { background: #222; padding: 15px; border-radius: 15px; margin-bottom: 15px; border-right: 5px solid #ffd700; }
         .coord-label { color: #ffd700; font-size: 0.8rem; text-align: right; display: block; margin-bottom: 5px; }
-        .coord-value { color: #fff; font-family: 'Courier New', monospace; font-size: 1.2rem; font-weight: bold; word-break: break-all; }
+        .coord-value { color: #fff; font-family: 'Courier New', monospace; font-size: 1.1rem; font-weight: bold; }
 
         button { width: 100%; padding: 16px; margin: 8px 0; border-radius: 15px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
         .btn-update { background-color: #ffd700; color: #000; }
-        .btn-civil { background-color: #1e88e5; color: #fff; } /* أزرق للسيفيل */
-        .btn-earth { background-color: #2e7d32; color: #fff; }  /* أخضر لجوجل إيرث */
+        .btn-civil { background-color: #1e88e5; color: #fff; }
+        .btn-earth { background-color: #2e7d32; color: #fff; }
 
-        .map-box { margin-top: 15px; height: 250px; border-radius: 15px; overflow: hidden; border: 1px solid #333; }
+        /* تعديل حاوية الخريطة لضمان الظهور */
+        .map-box { margin-top: 15px; height: 300px; border-radius: 15px; overflow: hidden; border: 2px solid #333; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
@@ -31,12 +34,12 @@
         <div class="tagline">نظام الرصد المتكامل (Civil 3D & Google Earth)</div>
 
         <div class="display-section">
-            <span class="coord-label">إحداثيات Civil 3D (E, N) - أمتار</span>
+            <span class="coord-label">إحداثيات Civil 3D (E, N)</span>
             <div class="coord-value" id="civil-display">E: 0.000 | N: 0.000</div>
         </div>
 
         <div class="display-section">
-            <span class="coord-label">إحداثيات Google Earth (Lat, Lon) - درجات</span>
+            <span class="coord-label">إحداثيات GPS (Lat, Lon)</span>
             <div class="coord-value" id="gps-display">Lat: 0.00000000 | Lon: 0.00000000</div>
         </div>
 
@@ -45,7 +48,7 @@
         <button class="btn-earth" onclick="downloadForEarth()">تحميل ملف Google Earth (CSV)</button>
 
         <div class="map-box" id="mapView">
-            <p style="padding-top: 100px; color: #444;">في انتظار تحديد الموقع...</p>
+            <p style="padding-top: 130px; color: #444;">اضغط "تحديث" لإظهار موقعك على الخريطة</p>
         </div>
     </div>
 
@@ -58,22 +61,22 @@
                     rawLat = p.coords.latitude;
                     rawLon = p.coords.longitude;
                     
-                    // تحويل تقريبي للأمتار (UTM Zone 38/39) لخدمة السيفيل
+                    // تحويل للأمتار كما في لقطة شاشتك السابقة
                     let easting = (rawLon * 100000).toFixed(3);
                     let northing = (rawLat * 111000).toFixed(3);
 
-                    // تحديث الشاشة
                     document.getElementById('civil-display').innerText = `E: ${easting} | N: ${northing}`;
                     document.getElementById('gps-display').innerText = `Lat: ${rawLat.toFixed(8)} | Lon: ${rawLon.toFixed(8)}`;
 
-                    // تحديث الخريطة
-                    const mapUrl = `https://www.google.com/maps?q=$${rawLat},${rawLon}&z=18&output=embed`;
+                    // الإصلاح: رابط خريطة جديد يركز على الإحداثيات (Zoom level 18)
+                    const mapUrl = `https://maps.google.com/maps?q=${rawLat},${rawLon}&z=18&output=embed`;
                     document.getElementById('mapView').innerHTML = `<iframe src="${mapUrl}"></iframe>`;
-                }, null, {enableHighAccuracy: true});
+                }, (err) => {
+                    alert("برجاء تفعيل الـ GPS والسماح للمتصفح بالوصول لموقعك.");
+                }, {enableHighAccuracy: true});
             }
         }
 
-        // تصدير للسيفيل (P,N,E,Z,D)
         function downloadForCivil() {
             if (rawLat === 0) return alert("ارصد النقطة أولاً!");
             let n = (rawLat * 111000).toFixed(3);
@@ -81,10 +84,8 @@
             saveFile(`1,${n},${e},0,SAHABY_CIVIL`, "Sahaby_Civil3D.csv");
         }
 
-        // تصدير لجوجل إيرث (Name, Latitude, Longitude)
         function downloadForEarth() {
             if (rawLat === 0) return alert("ارصد النقطة أولاً!");
-            // جوجل إيرث يفهم ملفات CSV إذا كانت الأعمدة واضحة
             let content = "Name,Latitude,Longitude,Description\n";
             content += `Sahaby_Point,${rawLat.toFixed(10)},${rawLon.toFixed(10)},Survey_By_Mahmoud_Sahaby`;
             saveFile(content, "Sahaby_GoogleEarth.csv");
