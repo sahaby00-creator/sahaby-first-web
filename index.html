@@ -3,144 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محول ملفات TXT لبروفايل Civil 3D - م. محمود صحابي</title>
+    <title>أداة المهندس محمود صحابي المتكاملة</title>
     
     <style>
         body { background-color: #0d0d0d; color: #ffd700; text-align: center; font-family: 'Segoe UI', sans-serif; padding: 10px; margin: 0; }
         .container { background: #1a1a1a; padding: 20px; border-radius: 20px; border: 2px solid #ffd700; max-width: 700px; margin: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-        h1 { font-size: 1.6rem; color: #ffd700; margin-bottom: 5px; }
-        .sub-text { color: #888; font-size: 0.85rem; margin-bottom: 20px; }
+        h1 { font-size: 1.6rem; color: #ffd700; margin: 0; }
+        .section-title { background: #333; padding: 8px; border-radius: 8px; margin: 20px 0 10px 0; font-size: 0.9rem; color: #fff; border-right: 4px solid #ffd700; text-align: right; }
         
-        /* منطقة رفع الملفات */
-        .upload-section { border: 2px dashed #ffd700; padding: 30px; border-radius: 15px; margin-bottom: 20px; background: #222; cursor: pointer; }
-        .upload-section:hover { background: #2a2a2a; }
-        #fileInput { display: none; }
+        /* تنسيق بيانات الموقع الحي */
+        .live-coords { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .coord-card { background: #262626; padding: 10px; border-radius: 10px; border: 1px solid #444; }
+        .label { display: block; color: #888; font-size: 0.7rem; }
+        .val { color: #fff; font-family: monospace; font-size: 1rem; font-weight: bold; }
 
-        /* منطقة رسم البروفايل الكروكي */
-        .profile-canvas-container { background: #000; border: 1px solid #444; border-radius: 10px; margin: 20px 0; padding: 10px; position: relative; height: 200px; }
+        /* منطقة الرفع والرسم */
+        .upload-area { border: 2px dashed #ffd700; padding: 20px; border-radius: 15px; background: #222; cursor: pointer; margin-bottom: 15px; }
+        .canvas-box { background: #000; height: 180px; border-radius: 10px; margin: 15px 0; border: 1px solid #333; }
         canvas { width: 100%; height: 100%; }
 
-        button { width: 100%; padding: 15px; margin: 5px 0; border-radius: 12px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        button { width: 100%; padding: 14px; margin: 5px 0; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-gps { background-color: #ffd700; color: #000; }
         .btn-export { background-color: #28a745; color: #fff; }
         
-        .points-table { width: 100%; margin-top: 20px; border-collapse: collapse; font-size: 0.75rem; background: #111; }
-        .points-table th, .points-table td { border: 1px solid #333; padding: 8px; text-align: center; }
-        .points-table th { background: #ffd700; color: #000; }
+        .map-frame { height: 200px; border-radius: 15px; overflow: hidden; margin-top: 10px; border: 1px solid #444; }
+        iframe { width: 100%; height: 100%; border: none; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.7rem; margin-top: 15px; background: #111; }
+        th, td { border: 1px solid #333; padding: 6px; text-align: center; }
+        th { background: #ffd700; color: #000; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h1>المهندس محمود صحابي</h1>
-        <div class="sub-text">معالج ملفات TXT وتحويلها إلى Profile (P,N,E,Z,D)</div>
+        <p style="color:#888; font-size: 0.8rem;">نظام المساحة الرقمي و Civil 3D - الرياض</p>
 
-        <div class="upload-section" onclick="document.getElementById('fileInput').click()">
-            <p id="file-status">إضغط هنا لرفع ملف الـ TXT الخاص بالنقاط</p>
-            <span style="font-size: 12px; color: #666;">التنسيق المطلوب: PT,N,E,Z,Desc أو PT E N Z Desc</span>
-            <input type="file" id="fileInput" accept=".txt" onchange="handleFile(this)">
+        <div class="section-title">📍 تحديد الموقع الحالي (GPS & Civil 3D)</div>
+        <div class="live-coords">
+            <div class="coord-card"><span class="label">Northing (N)</span><div class="val" id="live-n">0.000</div></div>
+            <div class="coord-card"><span class="label">Easting (E)</span><div class="val" id="live-e">0.000</div></div>
+            <div class="coord-card"><span class="label">Latitude</span><div class="val" id="live-lat">0.000000</div></div>
+            <div class="coord-card"><span class="label">Longitude</span><div class="val" id="live-lon">0.000000</div></div>
+        </div>
+        <button class="btn-gps" onclick="getLiveLocation()">تحديث الموقع الحالي 📡</button>
+        <div class="map-frame" id="mapView">
+            <p style="padding-top: 80px; color:#444;">الخريطة التفاعلية ستظهر هنا</p>
         </div>
 
-        <div class="profile-canvas-container">
-            <span style="position:absolute; top:5px; right:10px; color:#555; font-size:10px;">معاينة شكل الأرض الطبيعية</span>
-            <canvas id="profileCanvas"></canvas>
+        <div class="section-title">📈 معالجة ملفات TXT ورسم البروفايل</div>
+        <div class="upload-area" onclick="document.getElementById('fileIn').click()">
+            <p id="status">اضغط لرفع ملف TXT (نقاط البروفايل)</p>
+            <input type="file" id="fileIn" style="display:none" onchange="processTxt(this)">
         </div>
 
-        <button class="btn-export" id="downloadBtn" style="display:none;" onclick="exportToCivil()">تصدير الملف الموحد للسيفيل (CSV)</button>
+        <div class="canvas-box">
+            <canvas id="profileChart"></canvas>
+        </div>
 
-        <table class="points-table" id="pointsTable" style="display:none;">
-            <thead>
-                <tr>
-                    <th>Point</th>
-                    <th>Northing</th>
-                    <th>Easting</th>
-                    <th>Elevation (Z)</th>
-                </tr>
-            </thead>
+        <button class="btn-export" id="dlBtn" style="display:none" onclick="downloadFinalCSV()">تصدير الملف الموحد للسيفيل (CSV)</button>
+
+        <table id="dataTable" style="display:none">
+            <thead><tr><th>PT</th><th>N</th><th>E</th><th>Z (Elevation)</th></tr></thead>
             <tbody></tbody>
         </table>
     </div>
 
     <script>
-        let processedPoints = [];
+        let filePoints = [];
 
-        function handleFile(input) {
+        // وظيفة جلب الموقع الحي
+        function getLiveLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(p => {
+                    let lat = p.coords.latitude;
+                    let lon = p.coords.longitude;
+                    // تحويل تقريبي للسيفيل (كما في خطواتك السابقة)
+                    let n = (lat * 111000).toFixed(3);
+                    let e = (lon * 100000).toFixed(3);
+
+                    document.getElementById('live-n').innerText = n;
+                    document.getElementById('live-e').innerText = e;
+                    document.getElementById('live-lat').innerText = lat.toFixed(6);
+                    document.getElementById('live-lon').innerText = lon.toFixed(6);
+
+                    const mapUrl = `https://maps.google.com/maps?q=${lat},${lon}&z=17&output=embed`;
+                    document.getElementById('mapView').innerHTML = `<iframe src="${mapUrl}"></iframe>`;
+                }, null, {enableHighAccuracy: true});
+            }
+        }
+
+        // وظيفة معالجة الملف
+        function processTxt(input) {
             const file = input.files[0];
             if (!file) return;
-
-            document.getElementById('file-status').innerText = "جاري معالجة: " + file.name;
             const reader = new FileReader();
-
             reader.onload = function(e) {
-                const text = e.target.result;
-                const lines = text.split(/\r?\n/);
-                processedPoints = [];
-                
-                const tableBody = document.querySelector("#pointsTable tbody");
-                tableBody.innerHTML = "";
+                const lines = e.target.result.split(/\r?\n/);
+                filePoints = [];
+                const tbody = document.querySelector("#dataTable tbody");
+                tbody.innerHTML = "";
 
-                lines.forEach((line, index) => {
-                    // دعم الفواصل المختلفة (فاصلة، مسافة، أو Tab)
-                    const parts = line.split(/[,\s\t]+/).filter(p => p.trim() !== "");
+                lines.forEach(line => {
+                    const parts = line.split(/[,\s\t]+/).filter(i => i.trim() !== "");
                     if (parts.length >= 4) {
-                        const pt = {
-                            id: parts[0],
-                            n: parseFloat(parts[1]),
-                            e: parseFloat(parts[2]),
-                            z: parseFloat(parts[3]),
-                            desc: parts[4] || "STATION"
-                        };
+                        const pt = { id: parts[0], n: parts[1], e: parts[2], z: parseFloat(parts[3]) };
                         if (!isNaN(pt.z)) {
-                            processedPoints.push(pt);
-                            tableBody.innerHTML += `<tr><td>${pt.id}</td><td>${pt.n}</td><td>${pt.e}</td><td>${pt.z}</td></tr>`;
+                            filePoints.push(pt);
+                            tbody.innerHTML += `<tr><td>${pt.id}</td><td>${pt.n}</td><td>${pt.e}</td><td>${pt.z}</td></tr>`;
                         }
                     }
                 });
-
-                if (processedPoints.length > 0) {
-                    document.getElementById('pointsTable').style.display = "table";
-                    document.getElementById('downloadBtn').style.display = "block";
-                    drawProfile();
+                if (filePoints.length > 0) {
+                    document.getElementById('dataTable').style.display = "table";
+                    document.getElementById('dlBtn').style.display = "block";
+                    document.getElementById('status').innerText = "تمت المعالجة: " + file.name;
+                    drawCanvas();
                 }
             };
             reader.readAsText(file);
         }
 
-        function drawProfile() {
-            const canvas = document.getElementById('profileCanvas');
+        function drawCanvas() {
+            const canvas = document.getElementById('profileChart');
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            const elevations = processedPoints.map(p => p.z);
-            const minZ = Math.min(...elevations);
-            const maxZ = Math.max(...elevations);
-            const range = maxZ - minZ || 1;
+            const elevations = filePoints.map(p => p.z);
+            const min = Math.min(...elevations);
+            const max = Math.max(...elevations);
+            const range = max - min || 1;
 
             ctx.strokeStyle = "#ffd700";
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 3;
             ctx.beginPath();
-
-            processedPoints.forEach((p, i) => {
-                const x = (i / (processedPoints.length - 1)) * canvas.width;
-                const y = canvas.height - ((p.z - minZ) / range) * (canvas.height - 20) - 10;
-                
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
+            filePoints.forEach((p, i) => {
+                const x = (i / (filePoints.length - 1)) * canvas.width;
+                const y = canvas.height - ((p.z - min) / range) * (canvas.height - 40) - 20;
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
             });
             ctx.stroke();
         }
 
-        function exportToCivil() {
-            let csvContent = "P,N,E,Z,D\n";
-            processedPoints.forEach(p => {
-                csvContent += `${p.id},${p.n},${p.e},${p.z},${p.desc}\n`;
-            });
-
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "Sahaby_Final_Profile.csv";
-            link.click();
+        function downloadFinalCSV() {
+            let csv = "P,N,E,Z,D\n";
+            filePoints.forEach(p => csv += `${p.id},${p.n},${p.e},${p.z},SAHABY_PROF\n`);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "Sahaby_Full_Data.csv";
+            a.click();
         }
+        
+        window.onload = getLiveLocation; // تحديث الموقع تلقائياً عند الفتح
     </script>
 </body>
 </html>
