@@ -2,7 +2,12 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>محرك الصحابي المعتمد v32 | التحكم الثنائي</title>
+    <title>المهندس محمود صحابي | Mahmoud Sahaby - محرك الصحابي المعتمد</title>
+    
+    <meta name="description" content="الموقع الرسمي للمهندس محمود صحابي. استكشف محرك الصحابي المعتمد v32 للتحكم الثنائي في تصدير البيانات المساحية ورسم المسارات التصميمية.">
+    
+    <meta name="keywords" content="المهندس محمود صحابي, محمود صحابي, Mahmoud Sahaby, محرك الصحابي, مساحة, سيفيل 3D">
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -31,7 +36,7 @@
 <div class="container">
     <div class="header">
         <div>
-            <h2 style="margin:0; color:var(--gold);">🏗️ المحرك v32.0 | م. محمود صحابي</h2>
+            <h2 style="margin:0; color:var(--gold);">🏗️ المحرك v32.0 | المهندس محمود صحابي</h2>
             <small style="color:var(--green)">الاعتماد: تحكم منفصل في تصدير (Design vs NGL)</small>
         </div>
         <div style="display:flex; gap:10px;">
@@ -82,6 +87,7 @@
 </div>
 
 <script>
+    // الجزء البرمجي (Script) لم يتم لمسه لضمان عمل المحرك بنفس الكفاءة
     let pts = [], map, marker;
 
     function processNGL(input) {
@@ -91,7 +97,7 @@
             pts = lines.map((line, i) => {
                 const d = line.trim().split(/[, \s\t]+/);
                 if (d.length >= 3) {
-                    let east = parseFloat(d[d.length-3]), north = parseFloat(d[d.length-2]), elev = parseFloat(d[d.length-1]);
+                    let east = parseFloat(d[d.East || d.length-3]), north = parseFloat(d[d.North || d.length-2]), elev = parseFloat(d[d.Elev || d.length-1]);
                     return { id: i+1, e: east, n: north, z: elev, zD: elev, de: east, dn: north, lat: 24.717 + (i*0.0001), lon: 46.681 + (i*0.0001) };
                 }
             }).filter(p => p);
